@@ -11,11 +11,11 @@
                  nil
                  {:owner :black :height 3}
                  {:owner :white :height 2}])
-;; TODO Implement for more than 9 pieces in a pile (maybe butlast?)
-;; TODO Check if black actually is black (not just not-white)
-;; TODO Get rid of horrible character handling from first/last of string
-;; TODO Use (count) to get string length
-)}
+           ;; TODO Implement for more than 9 pieces in a pile (maybe butlast?)
+           ;; TODO Check if black actually is black (not just not-white)
+           ;; TODO Get rid of horrible character handling from first/last of string
+           ;; TODO Use (count) to get string length
+           )}
   [board-string]
   (->> (split board-string #" ")
        (map (fn [square-string]
@@ -420,4 +420,4 @@
                        (player-has-pieces-remaining? :white))))}
   [state player]
   (or (player-has-captured-pieces? state player)
-  (> (count (get-pieces-square-indices-of-player state player)) 0)))
+      (> (count (get-pieces-square-indices-of-player state player)) 0)))
