@@ -119,7 +119,7 @@
   (let [game-state (:game-state view-state)]
     [:div
      [:span {:style {:background-color (condp = (state/get-player-in-turn game-state)
-                                         :white "white"
+                                         :white "ghostwhite"
                                          :black "salmon")
                      :font-size        "100px"}}
       "Player in turn"]
