@@ -11,6 +11,7 @@
                  [org.clojure/core.async "0.2.395"
                   :exclusions [org.clojure/tools.reader]]
                   [ysera "1.0.3"]
+                 [reagent "0.6.0"]
                   [org.clojure/tools.namespace "0.2.11"]
                   [proto-repl "0.3.1"]]
 

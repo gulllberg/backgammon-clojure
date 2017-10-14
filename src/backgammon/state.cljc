@@ -1,5 +1,5 @@
 (ns backgammon.state
-  (:require [ysera.test :refer [is= is is-not]]
+  (:require [ysera.test #?(:clj :refer :cljs :refer-macros) [is= is is-not]]
             [ysera.collections :refer [remove-one]]
             [clojure.string :refer [split]]))
 
@@ -13,16 +13,16 @@
                  {:owner :white :height 2}])
            ;; TODO Implement for more than 9 pieces in a pile (maybe butlast?)
            ;; TODO Check if black actually is black (not just not-white)
-           ;; TODO Get rid of horrible character handling from first/last of string
-           ;; TODO Use (count) to get string length
            )}
   [board-string]
   (->> (split board-string #" ")
        (map (fn [square-string]
               (if (= square-string ".")
                 nil
-                {:owner (if (= (str (last square-string)) "w") :white :black)
-                 :height (- (int (first square-string)) 48)})))
+                (let [length (count square-string)]
+                  {:owner  (if (= (subs square-string (- length 1) length) "w") :white :black)
+                   :height #?(:clj (Integer/parseInt (subs square-string 0 1))
+                              :cljs (js/parseInt (subs square-string 0 1)))}))))
        (into [])))
 
 (defn create-standard-board []
@@ -31,36 +31,36 @@
 
 (defn create-state
   ;; Tested by create-standard-state
-  [{player-in-turn :player-in-turn
-    board :board
-    dice-roll :dice-roll
-    remaining-moves :remaining-moves
-    captured-pieces :captured-pieces
+  [{player-in-turn    :player-in-turn
+    board             :board
+    dice-roll         :dice-roll
+    remaining-moves   :remaining-moves
+    captured-pieces   :captured-pieces
     home-board-length :home-board-length}]
-  {:player-in-turn player-in-turn
-   :board board
-   :dice-roll dice-roll
-   :remaining-moves remaining-moves
-   :captured-pieces captured-pieces
+  {:player-in-turn    player-in-turn
+   :board             board
+   :dice-roll         dice-roll
+   :remaining-moves   remaining-moves
+   :captured-pieces   captured-pieces
    :home-board-length home-board-length})
 
 (defn create-standard-state
   {:test (fn []
            (is= (create-standard-state)
-                (create-state {:player-in-turn :white
-                               :board (create-standard-board)
-                               :dice-roll []
-                               :remaining-moves []
-                               :captured-pieces {:white 0
-                                                 :black 0}
+                (create-state {:player-in-turn    :white
+                               :board             (create-standard-board)
+                               :dice-roll         []
+                               :remaining-moves   []
+                               :captured-pieces   {:white 0
+                                                   :black 0}
                                :home-board-length 6})))}
   []
-  (create-state {:player-in-turn :white
-                 :board (create-standard-board)
-                 :dice-roll []
-                 :remaining-moves []
-                 :captured-pieces {:white 0
-                                   :black 0}
+  (create-state {:player-in-turn    :white
+                 :board             (create-standard-board)
+                 :dice-roll         []
+                 :remaining-moves   [1 6]
+                 :captured-pieces   {:white 0
+                                     :black 0}
                  :home-board-length 6}))
 
 (defn get-square-data
@@ -93,7 +93,7 @@
       (:height square-data))))
 
 (defn get-square-owner
-  {:test (fn  []
+  {:test (fn []
            (is= (-> (create-standard-state)
                     (get-square-owner 0))
                 :white)
@@ -144,7 +144,7 @@
            (is= (-> (create-standard-state)
                     (increase-pile {:square-index 3 :owner :white})
                     (get-square-data 3))
-                {:owner :white
+                {:owner  :white
                  :height 1}))}
 
   [state {square-index :square-index owner :owner}]
@@ -410,11 +410,11 @@
   {:test (fn []
            (is (-> (create-standard-state)
                    (player-has-pieces-remaining? :white)))
-           (is (-> (create-state {:board (create-board ". 1b")
+           (is (-> (create-state {:board           (create-board ". 1b")
                                   :captured-pieces {:white 1
                                                     :black 0}})
                    (player-has-pieces-remaining? :white)))
-           (is-not (-> (create-state {:board (create-board ". 1b")
+           (is-not (-> (create-state {:board           (create-board ". 1b")
                                       :captured-pieces {:white 0
                                                         :black 0}})
                        (player-has-pieces-remaining? :white))))}

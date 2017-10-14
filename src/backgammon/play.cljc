@@ -1,7 +1,8 @@
 (ns backgammon.play
   (:require [backgammon.core :as c]
             [backgammon.state :as s]
-            [clojure.core.async :refer [go <! timeout]]))
+            ;[clojure.core.async :refer [go <! timeout]]
+            ))
 
 (def state-atom (atom (c/create-state-for-first-turn)))
 
@@ -50,25 +51,25 @@
         (swap! state-atom c/end-turn-and-start-new-turn))))
   (draw-board (deref state-atom)))
 
-(add-watch state-atom :game-engine
-           (fn [_ _ _ state]
-             (draw-board state)
-             (cond
-               (c/player-has-won? state (s/get-player-in-turn state))
-               ((fn []
-                  (println "********************************")
-                  (println (str (s/get-player-in-turn (deref state-atom)) " has won!!! :D"))
-                  (println "********************************")))
-
-               (c/end-of-turn? state)
-               (swap! state-atom c/end-turn-and-start-new-turn)
-
-               :default
-               (let [movable-pieces-square-indices (c/get-movable-pieces-square-indices-of-player state (s/get-player-in-turn state))
-                     from-index (first (sort movable-pieces-square-indices))
-                     distance (last (sort (c/get-all-valid-moves-from-square state from-index)))]
-                 (go (<! (timeout 1000))
-                     (swap! state-atom c/move from-index distance))))))
+;(add-watch state-atom :game-engine
+;           (fn [_ _ _ state]
+;             (draw-board state)
+;             (cond
+;               (c/player-has-won? state (s/get-player-in-turn state))
+;               ((fn []
+;                  (println "********************************")
+;                  (println (str (s/get-player-in-turn (deref state-atom)) " has won!!! :D"))
+;                  (println "********************************")))
+;
+;               (c/end-of-turn? state)
+;               (swap! state-atom c/end-turn-and-start-new-turn)
+;
+;               :default
+;               (let [movable-pieces-square-indices (c/get-movable-pieces-square-indices-of-player state (s/get-player-in-turn state))
+;                     from-index (first (sort movable-pieces-square-indices))
+;                     distance (last (sort (c/get-all-valid-moves-from-square state from-index)))]
+;                 (go (<! (timeout 1000))
+;                     (swap! state-atom c/move from-index distance))))))
 
 (comment
 
